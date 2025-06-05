@@ -1,0 +1,439 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Portfolio of Ramesh P Koujalagi, an AI/ML Enthusiast specializing in machine learning, deep learning, computer vision, and cybersecurity.">
+    <meta name="keywords" content="AI, Machine Learning, Deep Learning, Computer Vision, Python, TensorFlow, Scikit-learn, OpenCV, Cybersecurity, Portfolio">
+    <meta name="author" content="Ramesh P Koujalagi">
+    <title>Ramesh P Koujalagi | AI/ML Engineer Portfolio</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="https://via.placeholder.com/32?text=AI">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: #0a0a23;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+        .starry-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: #0a0a23;
+        }
+        .star {
+            position: absolute;
+            background: #fff;
+            border-radius: 50%;
+            animation: twinkle 3s infinite alternate;
+        }
+        @keyframes twinkle {
+            0% { opacity: 0.3; }
+            100% { opacity: 0.8; }
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        .neon-text {
+            color: #00f6ff;
+            text-shadow: 0 0 5px #00f6ff, 0 0 10px #00f6ff;
+        }
+        .project-card {
+            transition: transform 0.3s ease;
+        }
+        .skill-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(0, 246, 255, 0.5);
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: #1a1a4e;
+            padding: 24px;
+            border-radius: 12px;
+            max-width: 700px;
+            width: 90%;
+        }
+        .counter {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+        }
+        section {
+            padding: 80px 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Starry Background -->
+    <div class="starry-bg" id="stars"></div>
+
+    <!-- Navigation Bar -->
+    <nav class="glass sticky top-0 z-50 shadow-lg">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="text-2xl font-bold neon-text">Ramesh P Koujalagi</div>
+            <div class="space-x-8">
+                <a href="#home" class="hover:text-cyan-300 transition">Home</a>
+                <a href="#about" class="hover:text-cyan-300 transition">About</a>
+                <a href="#skills" class="hover:text-cyan-300 transition">Skills</a>
+                <a href="#projects" class="hover:text-cyan-300 transition">Projects</a>
+                <a href="#certifications" class="hover:text-cyan-300 transition">Certifications</a>
+                <a href="#achievements" class="hover:text-cyan-300 transition">Achievements</a>
+                <a href="#contact" class="hover:text-cyan-300 transition">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="min-h-screen flex items-center justify-center text-center">
+        <div class="container mx-auto px-6" data-motion="fadeIn">
+            <h1 class="text-4xl md:text-6xl font-bold mb-4 neon-text" data-motion="fadeIn">Ramesh P Koujalagi</h1>
+            <p class="text-xl md:text-2xl mb-6" id="typing-text" data-motion="fadeIn" data-delay="0.2"></p>
+            <div class="space-x-4" data-motion="fadeIn" data-delay="0.4">
+                <a href="#projects" class="bg-cyan-500 text-white px-8 py-3 rounded-full font-semibold hover:bg-cyan-600 transition">Explore Projects</a>
+                <a href="C:\Users\rames\Desktop\Ramesh P Koujalagi.pdf" class="border-2 border-cyan-500 text-cyan-500 px-8 py-3 rounded-full font-semibold hover:bg-cyan-500 hover:text-white transition" target="_blank">Download Resume</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 neon-text" data-motion="fadeIn">About Me</h2>
+            <div class="max-w-3xl mx-auto glass p-8 rounded-lg" data-motion="fadeIn" data-delay="0.2">
+                <p class="mb-4 text-lg leading-relaxed">I’m an AI/ML Enthusiast pursuing a BE in Computer Science and Design at Tontadarya College of Engineering, Gadag (CGPA: 7.0/10). My expertise spans machine learning, deep learning, and computer vision, with projects like real-time rogue access point detection and facial recognition systems built using Python, TensorFlow, and OpenCV.</p>
+                <p class="mb-4 text-lg leading-relaxed">With strong communication, problem-solving, and teamwork skills, I thrive in delivering innovative solutions. I’m eager to join a forward-thinking team to push the boundaries of AI technology.</p>
+                <a href="#contact" class="text-cyan-300 hover:underline font-semibold">Let’s Connect!</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills Section -->
+    <section id="skills" class="bg-gray-900/30">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 neon-text" data-motion="fadeIn">Technical Skills</h2>
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 max-w-4xl mx-auto" data-motion="fadeIn" data-delay="0.2">
+                <div class="glass p-4 rounded-lg text-center skill-card transition">Python</div>
+                <div class="glass p-4 rounded-lg text-center skill-card transition">TensorFlow</div>
+                <div class="glass p-4 rounded-lg text-center skill-card transition">Scikit-learn</div>
+                <div class="glass p-4 rounded-lg text-center skill-card transition">OpenCV</div>
+                <div class="glass p-4 rounded-lg text-center skill-card transition">Java</div>
+                <div class="glass p-4 rounded-lg text-center skill-card transition">C</div>
+                <div class="glass p-4 rounded-lg text-center skill-card transition">SQL</div>
+                <div class="glass p-4 rounded-lg text-center skill-card transition">Kali Linux</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 neon-text" data-motion="fadeIn">Projects</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+                <div class="glass p-6 rounded-lg project-card" data-tilt data-motion="fadeIn" data-delay="0.1">
+                    <h3 class="text-xl font-semibold mb-2 neon-text">Real-Time Rogue Access Point Detection</h3>
+                    <p class="mb-4">AI-driven system to detect unauthorized Wi-Fi access points using Random Forest (92% accuracy). Built with Python, Scikit-learn, and Kali Linux.</p>
+                    <p class="mb-4"><strong>Impact:</strong> Enhanced cybersecurity by proactively detecting threats.</p>
+                    <a href="https://github.com/Ramesh-Koujalagi" class="text-cyan-300 hover:underline" target="_blank">View on GitHub</a>
+                    <button class="text-cyan-300 hover:underline ml-4" onclick="openModal('rogue')">Details</button>
+                </div>
+                <div class="glass p-6 rounded-lg project-card" data-tilt data-motion="fadeIn" data-delay="0.2">
+                    <h3 class="text-xl font-semibold mb-2 neon-text">Real-Time Attendance System</h3>
+                    <p class="mb-4">Facial recognition system with Firebase integration using OpenCV and CNN (95% accuracy). Features a Tkinter interface.</p>
+                    <p class="mb-4"><strong>Impact:</strong> Reduced manual effort by 80% in attendance tracking.</p>
+                    <a href="https://github.com/Ramesh-Koujalagi" class="text-cyan-300 hover:underline" target="_blank">View on GitHub</a>
+                    <button class="text-cyan-300 hover:underline ml-4" onclick="openModal('attendance')">Details</button>
+                </div>
+                <div class="glass p-6 rounded-lg project-card" data-tilt data-motion="fadeIn" data-delay="0.3">
+                    <h3 class="text-xl font-semibold mb-2 neon-text">Real-Time Iris Gaze Tracking</h3>
+                    <p class="mb-4">Computer vision app for iris tracking using OpenCV and Dlib (90% accuracy). Optimized with multithreading.</p>
+                    <p class="mb-4"><strong>Impact:</strong> Enabled assistive technology and UI design applications.</p>
+                    <a href="https://github.com/Ramesh-Koujalagi" class="text-cyan-300 hover:underline" target="_blank">View on GitHub</a>
+                    <button class="text-cyan-300 hover:underline ml-4" onclick="openModal('iris')">Details</button>
+                </div>
+                <div class="glass p-6 rounded-lg project-card" data-tilt data-motion="fadeIn" data-delay="0.4">
+                    <h3 class="text-xl font-semibold mb-2 neon-text">Online Event Management Website</h3>
+                    <p class="mb-4">Full-stack web app for event planning using HTML, CSS, and SQL. Supports 100+ concurrent users.</p>
+                    <p class="mb-4"><strong>Impact:</strong> Reduced planning time by 60% for organizers.</p>
+                    <a href="https://github.com/Ramesh-Koujalagi" class="text-cyan-300 hover:underline" target="_blank">View on GitHub</a>
+                    <button class="text-cyan-300 hover:underline ml-4" onclick="openModal('event')">Details</button>
+                </div>
+            </div>
+        </div>
+        <!-- Project Modals -->
+        <div id="modal-rogue" class="modal">
+            <div class="modal-content">
+                <h3 class="text-xl font-semibold mb-4 neon-text">Real-Time Rogue Access Point Detection</h3>
+                <p class="leading-relaxed">Developed an AI-driven system to detect unauthorized Wi-Fi access points in real-time using machine learning algorithms. Implemented feature extraction from network traffic data and trained a Random Forest model to classify rogue access points with 92% accuracy. Utilized Python, Scikit-learn, and Kali Linux for packet analysis and model deployment.</p>
+                <p class="mt-4"><strong>Technologies:</strong> Python, Scikit-learn, Kali Linux, Random Forest</p>
+                <p><strong>Impact:</strong> Strengthened organizational cybersecurity.</p>
+                <button class="mt-4 text-cyan-300 hover:underline" onclick="closeModal('rogue')">Close</button>
+            </div>
+        </div>
+        <div id="modal-attendance" class="modal">
+            <div class="modal-content">
+                <h3 class="text-xl font-semibold mb-4 neon-text">Real-Time Attendance System</h3>
+                <p class="leading-relaxed">Designed a facial recognition-based attendance system integrated with Firebase for secure data storage. Employed OpenCV and CNN to achieve 95% recognition accuracy. Built a user-friendly Tkinter interface, streamlining attendance tracking for educational institutions.</p>
+                <p class="mt-4"><strong>Technologies:</strong> Python, OpenCV, Firebase, Tkinter, CNN</p>
+                <p><strong>Impact:</strong> Reduced manual effort by 80%.</p>
+                <button class="mt-4 text-cyan-300 hover:underline" onclick="closeModal('attendance')">Close</button>
+            </div>
+        </div>
+        <div id="modal-iris" class="modal">
+            <div class="modal-content">
+                <h3 class="text-xl font-semibold mb-4 neon-text">Real-Time Iris Gaze Tracking</h3>
+                <p class="leading-relaxed">Created a computer vision application to track iris movement for accessibility solutions. Leveraged OpenCV and Dlib for real-time eye detection and gaze estimation (90% accuracy). Optimized performance using multithreading.</p>
+                <p class="mt-4"><strong>Technologies:</strong> Python, OpenCV, Dlib, Multithreading</p>
+                <p><strong>Impact:</strong> Enabled innovative assistive technology.</p>
+                <button class="mt-4 text-cyan-300 hover:underline" onclick="closeModal('iris')">Close</button>
+            </div>
+        </div>
+        <div id="modal-event" class="modal">
+            <div class="modal-content">
+                <h3 class="text-xl font-semibold mb-4 neon-text">Online Event Management Website</h3>
+                <p class="leading-relaxed">Developed a full-stack web application for event planning and management using HTML, CSS, and SQL. Designed a relational database schema for efficient data handling. Implemented secure authentication, supporting 100+ concurrent users.</p>
+                <p class="mt-4"><strong>Technologies:</strong> HTML, CSS, SQL, JavaScript</p>
+                <p><strong>Impact:</strong> Reduced planning time by 60%.</p>
+                <button class="mt-4 text-cyan-300 hover:underline" onclick="closeModal('event')">Close</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Certifications Section -->
+    <section id="certifications" class="bg-gray-900/30">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 neon-text" data-motion="fadeIn">Certifications</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-3xl mx-auto" data-motion="fadeIn" data-delay="0.2">
+                <div class="glass p-4 rounded-lg">AI Machine Learning Engineer (NSQF Level 5), NASSCOM, March 2025</div>
+                <div class="glass p-4 rounded-lg">Certified AI - Machine Learning Engineer, PMKVY 4.0, NASSCOM, March 2025</div>
+                <div class="glass p-4 rounded-lg">Unified Modelling Language, Infosys Springboard</div>
+                <div class="glass p-4 rounded-lg">Database and SQL, Infosys Springboard</div>
+                <div class="glass p-4 rounded-lg">Object-Oriented Analysis, Design, and Programming with UML</div>
+                <div class="glass p-4 rounded-lg">Wadhwani Foundation Certificate</div>
+            </div>
+            <p class="text-center mt-8"><span class="counter" data-target="6">0</span> Certifications Earned</p>
+        </div>
+    </section>
+
+    <!-- Achievements Section -->
+    <section id="achievements">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 neon-text" data-motion="fadeIn">Achievements</h2>
+            <div class="max-w-3xl mx-auto space-y-6" data-motion="fadeIn" data-delay="0.2">
+                <div class="glass p-4 rounded-lg">Secured All India Rank <span class="counter" data-target="5354">0</span> in TCS Code Vita Season 12.</div>
+                <div class="glass p-4 rounded-lg">Publishing a technical paper on "Rogue Access Point Detection Using Machine Learning" in an IEEE conference.</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="bg-gray-900/30">
+        <div class="container mx-auto px-6 text-center">
+            <h2 class="text-3xl md:text-4xl font-bold mb-12 neon-text" data-motion="fadeIn">Get in Touch</h2>
+            <div class="flex justify-center space-x-8 mb-8" data-motion="fadeIn" data-delay="0.2">
+                <a href="https://www.linkedin.com/in/ramesh-koujalagi-0a4497231?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" target="_blank" class="hover:text-cyan-300 transition"><i class="fab fa-linkedin text-2xl"></i></a>
+                <a href="https://github.com/rameshkoujalagi" target="_blank" class="hover:text-cyan-300 transition"><i class="fab fa-github text-2xl"></i></a>
+                <a href="mailto:rameshkoujalagi806@gmail.com" class="hover:text-cyan-300 transition"><i class="fas fa-envelope text-2xl"></i></a>
+                <a href="tel:+917204509832" class="hover:text-cyan-300 transition"><i class="fas fa-phone text-2xl"></i></a>
+            </div>
+            <p class="mb-8 text-lg" data-motion="fadeIn" data-delay="0.4">Location: Munavalli, Karnataka, India</p>
+            <div class="max-w-lg mx-auto glass p-8 rounded-lg" data-motion="fadeIn" data-delay="0.6">
+                <h3 class="text-xl font-semibold mb-6 neon-text">Send a Message</h3>
+                <div class="space-y-4">
+                    <input type="text" id="name" placeholder="Your Name" class="w-full p-3 rounded-lg bg-gray-800/50 text-white border border-gray-600 focus:outline-none focus:border-cyan-500" required>
+                    <input type="email" id="email" placeholder="Your Email" class="w-full p-3 rounded-lg bg-gray-800/50 text-white border border-gray-600 focus:outline-none focus:border-cyan-500" required>
+                    <textarea id="message" placeholder="Your Message" class="w-full p-3 rounded-lg bg-gray-800/50 text-white border border-gray-600 focus:outline-none focus:border-cyan-500 h-32" required></textarea>
+                    <button id="send-btn" class="bg-cyan-500 text-white px-6 py-3 rounded-full font-semibold hover:bg-cyan-600 transition w-full">Send Message</button>
+                    <p id="form-error" class="text-red-400 hidden">Please fill all fields correctly.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-6 text-center">
+        <p>© 2025 Ramesh P Koujalagi. All rights reserved.</p>
+    </footer>
+
+    <!-- CDN Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/framer-motion/6.5.1/framer-motion.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.7.2/vanilla-tilt.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/typed.js/2.0.12/typed.min.js"></script>
+    <script>
+        // Starry Background
+        const starsContainer = document.getElementById('stars');
+        for (let i = 0; i < 50; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.width = star.style.height = Math.random() * 1.5 + 'px';
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.animationDelay = Math.random() * 3 + 's';
+            starsContainer.appendChild(star);
+        }
+
+        // Typed.js for Hero Section
+        new Typed('#typing-text', {
+            strings: ['AI/ML Enthusiast', 'Deep Learning Innovator', 'Computer Vision Expert'],
+            typeSpeed: 50,
+            backSpeed: 30,
+            loop: true
+        });
+
+        // Framer Motion Animations
+        document.querySelectorAll('[data-motion="fadeIn"]').forEach(element => {
+            const delay = parseFloat(element.getAttribute('data-delay') || 0);
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        element.animate([
+                            { opacity: 0, transform: 'translateY(30px)' },
+                            { opacity: 1, transform: 'translateY(0)' }
+                        ], {
+                            duration: 600,
+                            delay: delay * 1000,
+                            easing: 'ease-in-out',
+                            fill: 'forwards'
+                        });
+                        observer.unobserve(element);
+                    }
+                });
+            }, { threshold: 0.2 });
+            observer.observe(element);
+        });
+
+        // Vanilla Tilt for Project Cards
+        VanillaTilt.init(document.querySelectorAll('[data-tilt]'), {
+            max: 10,
+            speed: 600,
+            glare: true,
+            'max-glare': 0.3
+        });
+
+        // Counter Animation
+        document.querySelectorAll('.counter').forEach(counter => {
+            const target = parseInt(counter.getAttribute('data-target'));
+            let count = 0;
+            const increment = target / 100;
+            const updateCounter = () => {
+                count += increment;
+                if (count < target) {
+                    counter.textContent = Math.ceil(count);
+                    requestAnimationFrame(updateCounter);
+                } else {
+                    counter.textContent = target;
+                }
+            };
+            const observer = new IntersectionObserver((entries) => {
+                if (entries[0].isIntersecting) {
+                    updateCounter();
+                    observer.unobserve(counter);
+                }
+            }, { threshold: 0.5 });
+            observer.observe(counter);
+        });
+
+        // Modal Functions
+        function openModal(id) {
+            document.getElementById(`modal-${id}`).style.display = 'flex';
+        }
+        function closeModal(id) {
+            document.getElementById(`modal-${id}`).style.display = 'none';
+        }
+
+        // Contact Form Validation
+        const formInputs = {
+            name: document.getElementById('name'),
+            email: document.getElementById('email'),
+            message: document.getElementById('message'),
+            sendBtn: document.getElementById('send-btn'),
+            error: document.getElementById('form-error')
+        };
+        formInputs.sendBtn.addEventListener('click', () => {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (formInputs.name.value.trim() && emailRegex.test(formInputs.email.value) && formInputs.message.value.trim()) {
+                formInputs.error.classList.add('hidden');
+                alert('Message sent! (Note: This is a demo; integrate with a backend for actual submission.)');
+                formInputs.name.value = formInputs.email.value = formInputs.message.value = '';
+            } else {
+                formInputs.error.classList.remove('hidden');
+            }
+        });
+
+        // Smooth Scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
